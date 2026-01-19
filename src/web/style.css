@@ -364,6 +364,6 @@ input:checked~.label-text {
     background: linear-gradient(90deg, var(--primary), var(--accent));
     box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
     width: 0%;
-    transition: width 0.3s ease-out;
+    /* Transition managed by JS for rubber-band effect */
     border-radius: 6px;
 }

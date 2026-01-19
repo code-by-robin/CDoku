@@ -126,43 +126,78 @@ const app = {
     },
 
     runBenchmarkLive: function (totalIterations) {
-        const CHUNK_SIZE = 1000; // Generate 1000 sudokus per frame
+        // Time-Slicing: Instead of fixed chunks, we run as many as possible in 8ms.
+        // This leaves ~8ms for the browser to render the frame (60fps = 16.6ms).
+        const TIME_BUDGET_MS = 8;
+
         let completed = 0;
         const startTime = performance.now();
         const countValEl = document.getElementById('current-count');
         const progressFillEl = document.getElementById('progress-fill');
 
-        const processChunk = () => {
-            const batchEnd = Math.min(completed + CHUNK_SIZE, totalIterations);
+        // Rubber band animation state
+        this.visualProgress = 0;
+        this.targetProgress = 0;
+        let animationFrameId;
 
-            for (let i = completed; i < batchEnd; i++) {
-                this.core.resetMatrix();
-                this.core.generator();
+        // Physics-based animation loop
+        const animateProgressBar = () => {
+            const diff = this.targetProgress - this.visualProgress;
+
+            // Proportional control
+            if (Math.abs(diff) < 0.1) {
+                this.visualProgress = this.targetProgress;
+            } else {
+                this.visualProgress += diff * 0.1;
             }
 
-            completed = batchEnd;
-            countValEl.textContent = completed.toLocaleString();
+            progressFillEl.style.width = this.visualProgress + '%';
 
-            // Update Progress Bar
-            const percent = (completed / totalIterations) * 100;
-            progressFillEl.style.width = percent + '%';
+            if (completed < totalIterations || this.visualProgress < 99.9) {
+                animationFrameId = requestAnimationFrame(animateProgressBar);
+            } else {
+                progressFillEl.style.width = '100%';
+            }
+        };
+
+        animationFrameId = requestAnimationFrame(animateProgressBar);
+
+        const processChunk = () => {
+            const chunkStart = performance.now();
+
+            // Run loop until time budget is exceeded
+            while (performance.now() - chunkStart < TIME_BUDGET_MS && completed < totalIterations) {
+                this.core.resetMatrix();
+                this.core.generator();
+                completed++;
+            }
+
+            countValEl.textContent = completed.toLocaleString();
+            this.targetProgress = (completed / totalIterations) * 100;
 
             if (completed < totalIterations) {
-                // Schedule next chunk
-                // requestAnimationFrame gives the browser a chance to paint the updated textContent
-                requestAnimationFrame(processChunk);
+                // Yield to main thread for rendering, then continue
+                setTimeout(processChunk, 0);
             } else {
                 // Done
                 const endTime = performance.now();
                 const durationSec = (endTime - startTime) / 1000;
                 const rate = totalIterations / durationSec;
-                this.displayStats(durationSec, rate);
-                document.getElementById('live-counter').style.display = 'none';
-                document.getElementById('progress-container').style.display = 'none';
+
+                // Allow cleanup
+                setTimeout(() => {
+                    cancelAnimationFrame(animationFrameId);
+                    progressFillEl.style.width = '100%';
+
+                    this.displayStats(durationSec, rate);
+                    document.getElementById('live-counter').style.display = 'none';
+                    document.getElementById('progress-container').style.display = 'none';
+                }, 500);
             }
         };
 
-        requestAnimationFrame(processChunk);
+        // Start processing
+        setTimeout(processChunk, 0);
     },
 
     displayStats: function (duration, rate) {
