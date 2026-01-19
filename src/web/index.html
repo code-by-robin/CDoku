@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDoku Web</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Landing View -->
+    <div id="landing-view" class="view-container active">
+        <h1>CDoku Web</h1>
+        <div class="card-container">
+            <div class="mode-card" onclick="app.switchToSingle()">
+                <h2>Single Run</h2>
+                <p>Generate a single Sudoku field and visualize the result instantly.</p>
+            </div>
+            <div class="mode-card" onclick="app.switchToBenchmark()">
+                <h2>Benchmark</h2>
+                <p>Run the high-performance generator loop (100,000x) and measure speed.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Single Run View -->
+    <div id="single-view" class="view-container">
+        <h1>Generated Sudoku</h1>
+        <div class="sudoku-board" id="sudoku-board">
+            <!-- 9 Boxes of 9 Cells will be injected here -->
+        </div>
+        <div class="controls">
+            <button class="btn btn-secondary" onclick="app.showLanding()">Back</button>
+            <button class="btn" onclick="app.runSingle()">Regenerate</button>
+        </div>
+    </div>
+
+    <!-- Benchmark View -->
+    <div id="benchmark-view" class="view-container">
+        <h1>Benchmark</h1>
+        <div id="loading-spinner" class="spinner"></div>
+        
+        <div id="stats-output" class="stats-container" style="display: none;">
+            <div class="stat-item">
+                <span class="stat-label">Iterations</span>
+                <span class="stat-value">100,000</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Time</span>
+                <span class="stat-value" id="stat-time">0.00s</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Sudokus / Sec</span>
+                <span class="stat-value" id="stat-rate">0</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-secondary" onclick="app.showLanding()">Back</button>
+            <button class="btn" id="btn-rerun" onclick="app.runBenchmark()" style="display: none;">Run Again</button>
+        </div>
+    </div>
+
+    <script src="sudoku_core.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

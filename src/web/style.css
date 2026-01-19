@@ -1,0 +1,230 @@
+:root {
+    --bg-color: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --primary: #3b82f6;
+    --accent: #6366f1;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --grid-border: #475569;
+    --cell-bg: #1e293b;
+    --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                      radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                      radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+    color: var(--text-main);
+    font-family: var(--font-family);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+}
+
+h1 {
+    font-weight: 800;
+    font-size: 3rem;
+    background: linear-gradient(to right, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 2rem;
+    letter-spacing: -0.05em;
+}
+
+/* View Container */
+.view-container {
+    width: 100%;
+    max-width: 800px;
+    padding: 2rem;
+    box-sizing: border-box;
+    display: none; /* Hidden by default */
+    animation: fadeIn 0.5s ease-out;
+}
+
+.view-container.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Landing Page Cards */
+.card-container {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.mode-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.5rem;
+    padding: 3rem 2rem;
+    width: 250px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.mode-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    border-color: var(--primary);
+}
+
+.mode-card h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+}
+
+.mode-card p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Buttons */
+.btn {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+    font-size: 1rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--text-muted);
+    margin-right: 1rem;
+    box-shadow: none;
+}
+
+/* Sudoku Grid */
+.sudoku-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 2px;
+    background-color: var(--grid-border);
+    border: 4px solid var(--grid-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.cell {
+    width: 40px;
+    height: 40px;
+    background-color: var(--cell-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+    transition: background-color 0.2s;
+}
+
+.cell:nth-child(3n) {
+    border-right: 2px solid var(--grid-border);
+}
+.cell:nth-child(9n) {
+    border-right: none;
+}
+/* Horizontal dividers logic is tricky with pure grid gaps, handling via specific styling or just simpler gap approach */
+/* To make it look like 3x3 boxes, we can add margin to specific cells or use nested grids. Let's use a simpler border hack on specific cells if needed, or just let the gaps be. 
+   For simplicity and "identical structure" feel, standard grid is fine. 
+   But "Premium" requires 3x3 distinction. Let's try CSS Grid gap tricks.
+*/
+
+/* Better 3x3 Grid support */
+.sudoku-board {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 4px;
+    background-color: var(--grid-border);
+    border: 4px solid var(--grid-border);
+    border-radius: 8px;
+}
+.box {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background-color: var(--grid-border);
+}
+.box .cell {
+    width: 45px;
+    height: 45px;
+    background-color: var(--cell-bg);
+}
+
+/* Benchmark Stats */
+.stats-container {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 2rem;
+    border: 1px solid rgba(255,255,255,0.05);
+    width: 100%;
+    max-width: 400px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    color: var(--text-muted);
+}
+
+.stat-value {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--primary);
+}
+
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-left-color: var(--primary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 2rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
