@@ -60,8 +60,9 @@ const app = {
                         const row = boxRow * 3 + i;
                         const col = boxCol * 3 + j;
                         const cell = document.createElement('div');
-                        cell.className = 'cell';
+                        cell.className = 'cell pop-in'; // Add animation class
                         cell.textContent = matrix[row][col];
+
                         box.appendChild(cell);
                     }
                 }
