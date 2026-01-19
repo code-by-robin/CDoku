@@ -8,13 +8,14 @@
     --grid-border: #475569;
     --cell-bg: #1e293b;
     --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    --warning: #fbbf24;
 }
 
 body {
     background-color: var(--bg-color);
-    background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                      radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                      radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+    background-image: radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+        radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+        radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
     color: var(--text-main);
     font-family: var(--font-family);
     margin: 0;
@@ -43,7 +44,8 @@ h1 {
     max-width: 800px;
     padding: 2rem;
     box-sizing: border-box;
-    display: none; /* Hidden by default */
+    display: none;
+    /* Hidden by default */
     animation: fadeIn 0.5s ease-out;
 }
 
@@ -54,8 +56,15 @@ h1 {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Landing Page Cards */
@@ -154,14 +163,10 @@ h1 {
 .cell:nth-child(3n) {
     border-right: 2px solid var(--grid-border);
 }
+
 .cell:nth-child(9n) {
     border-right: none;
 }
-/* Horizontal dividers logic is tricky with pure grid gaps, handling via specific styling or just simpler gap approach */
-/* To make it look like 3x3 boxes, we can add margin to specific cells or use nested grids. Let's use a simpler border hack on specific cells if needed, or just let the gaps be. 
-   For simplicity and "identical structure" feel, standard grid is fine. 
-   But "Premium" requires 3x3 distinction. Let's try CSS Grid gap tricks.
-*/
 
 /* Better 3x3 Grid support */
 .sudoku-board {
@@ -172,12 +177,14 @@ h1 {
     border: 4px solid var(--grid-border);
     border-radius: 8px;
 }
+
 .box {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1px;
     background-color: var(--grid-border);
 }
+
 .box .cell {
     width: 45px;
     height: 45px;
@@ -189,7 +196,7 @@ h1 {
     background: var(--card-bg);
     border-radius: 1rem;
     padding: 2rem;
-    border: 1px solid rgba(255,255,255,0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     width: 100%;
     max-width: 400px;
 }
@@ -198,7 +205,7 @@ h1 {
     display: flex;
     justify-content: space-between;
     padding: 1rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .stat-item:last-child {
@@ -226,5 +233,137 @@ h1 {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Toggle Switch and Controls */
+.card-controls {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+}
+
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 60px;
+    cursor: pointer;
+    user-select: none;
+    min-height: 34px;
+}
+
+.toggle-switch.small {
+    padding-left: 46px;
+    /* 36px width + 10px gap */
+    min-height: 24px;
+}
+
+.toggle-switch input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 34px;
+    width: 60px;
+    background-color: var(--grid-border);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-switch.small .slider {
+    height: 24px;
+    width: 44px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.toggle-switch.small .slider:before {
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+}
+
+input:checked+.slider {
+    background-color: var(--primary);
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px var(--primary);
+}
+
+input:checked+.slider:before {
+    transform: translateX(26px);
+}
+
+.toggle-switch.small input:checked+.slider:before {
+    transform: translateX(20px);
+}
+
+.label-text {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+input:checked~.label-text {
+    color: var(--text-main);
+}
+
+.warning-text {
+    font-size: 0.8rem;
+    color: var(--warning);
+    margin: 0;
+    opacity: 0.8;
+}
+
+.live-counter {
+    font-size: 1.5rem;
+    font-family: monospace;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 1rem;
+}
+
+/* Progress Bar */
+.progress-bar-container {
+    width: 100%;
+    max-width: 400px;
+    height: 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    width: 0%;
+    transition: width 0.1s linear;
+    border-radius: 6px;
 }

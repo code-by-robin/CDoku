@@ -73,25 +73,96 @@ const app = {
     // --- Benchmark Logic ---
     runBenchmark: function () {
         const ITERATIONS = 100000;
+        const liveMode = document.getElementById('live-progress-toggle').checked;
+
+        // Update UI logic for running state
         document.getElementById('stats-output').style.display = 'none';
         document.getElementById('btn-rerun').style.display = 'none';
-        document.getElementById('loading-spinner').style.display = 'block';
+        document.getElementById('btn-start').style.display = 'none'; // Hide Start button
+
+        const counterEl = document.getElementById('live-counter');
+        const countValEl = document.getElementById('current-count');
+        const spinnerEl = document.getElementById('loading-spinner');
+        const progressContainerEl = document.getElementById('progress-container');
+        const progressFillEl = document.getElementById('progress-fill');
+
+        if (liveMode) {
+            // Live Mode: Show Progress Bar, Hide Spinner
+            counterEl.style.display = 'block';
+            countValEl.textContent = '0';
+            spinnerEl.style.display = 'none';
+            progressContainerEl.style.display = 'block';
+            progressFillEl.style.width = '0%';
+        } else {
+            // Fast Mode: Show Spinner, Hide Progress Bar
+            counterEl.style.display = 'none';
+            spinnerEl.style.display = 'block';
+            progressContainerEl.style.display = 'none';
+        }
 
         // Use setTimeout to loose coupling with UI repaint
         setTimeout(() => {
-            const startTime = performance.now();
+            if (liveMode) {
+                this.runBenchmarkLive(ITERATIONS);
+            } else {
+                this.runBenchmarkFast(ITERATIONS);
+            }
+        }, 50);
+    },
 
-            for (let i = 0; i < ITERATIONS; i++) {
+    runBenchmarkFast: function (iterations) {
+        const startTime = performance.now();
+
+        for (let i = 0; i < iterations; i++) {
+            this.core.resetMatrix();
+            this.core.generator();
+        }
+
+        const endTime = performance.now();
+        const durationSec = (endTime - startTime) / 1000;
+        const rate = iterations / durationSec;
+
+        this.displayStats(durationSec, rate);
+    },
+
+    runBenchmarkLive: function (totalIterations) {
+        const CHUNK_SIZE = 1000; // Generate 1000 sudokus per frame
+        let completed = 0;
+        const startTime = performance.now();
+        const countValEl = document.getElementById('current-count');
+        const progressFillEl = document.getElementById('progress-fill');
+
+        const processChunk = () => {
+            const batchEnd = Math.min(completed + CHUNK_SIZE, totalIterations);
+
+            for (let i = completed; i < batchEnd; i++) {
                 this.core.resetMatrix();
                 this.core.generator();
             }
 
-            const endTime = performance.now();
-            const durationSec = (endTime - startTime) / 1000;
-            const rate = ITERATIONS / durationSec;
+            completed = batchEnd;
+            countValEl.textContent = completed.toLocaleString();
 
-            this.displayStats(durationSec, rate);
-        }, 50);
+            // Update Progress Bar
+            const percent = (completed / totalIterations) * 100;
+            progressFillEl.style.width = percent + '%';
+
+            if (completed < totalIterations) {
+                // Schedule next chunk
+                // requestAnimationFrame gives the browser a chance to paint the updated textContent
+                requestAnimationFrame(processChunk);
+            } else {
+                // Done
+                const endTime = performance.now();
+                const durationSec = (endTime - startTime) / 1000;
+                const rate = totalIterations / durationSec;
+                this.displayStats(durationSec, rate);
+                document.getElementById('live-counter').style.display = 'none';
+                document.getElementById('progress-container').style.display = 'none';
+            }
+        };
+
+        requestAnimationFrame(processChunk);
     },
 
     displayStats: function (duration, rate) {

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
+
 <body>
 
     <!-- Landing View -->
@@ -22,6 +24,14 @@
             <div class="mode-card" onclick="app.switchToBenchmark()">
                 <h2>Benchmark</h2>
                 <p>Run the high-performance generator loop (100,000x) and measure speed.</p>
+
+                <div class="card-controls" onclick="event.stopPropagation()">
+                    <label class="toggle-switch small">
+                        <input type="checkbox" id="live-progress-toggle">
+                        <span class="slider round"></span>
+                        <span class="label-text">Live Progress (slower)</span>
+                    </label>
+                </div>
             </div>
         </div>
     </div>
@@ -41,8 +51,16 @@
     <!-- Benchmark View -->
     <div id="benchmark-view" class="view-container">
         <h1>Benchmark</h1>
-        <div id="loading-spinner" class="spinner"></div>
-        
+
+        <div id="loading-spinner" class="spinner" style="display: none;"></div>
+
+        <div id="progress-container" class="progress-bar-container" style="display: none;">
+            <div id="progress-fill" class="progress-bar-fill" style="width: 0%"></div>
+        </div>
+
+        <div id="live-counter" class="live-counter" style="display: none;">Generated: <span id="current-count">0</span>
+            / 100,000</div>
+
         <div id="stats-output" class="stats-container" style="display: none;">
             <div class="stat-item">
                 <span class="stat-label">Iterations</span>
@@ -60,6 +78,7 @@
 
         <div class="controls">
             <button class="btn btn-secondary" onclick="app.showLanding()">Back</button>
+            <button class="btn" id="btn-start" onclick="app.runBenchmark()">Start Benchmark</button>
             <button class="btn" id="btn-rerun" onclick="app.runBenchmark()" style="display: none;">Run Again</button>
         </div>
     </div>
@@ -67,4 +86,5 @@
     <script src="sudoku_core.js"></script>
     <script src="app.js"></script>
 </body>
+
 </html>
