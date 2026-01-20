@@ -41,7 +41,32 @@ const app = {
     runSingle: function () {
         this.core.resetMatrix();
         this.core.generator();
+
+        // Reset play mode state
+        this.isPlaying = false;
+        document.getElementById('play-controls').classList.remove('active');
+
         this.renderGrid(this.core.matrix);
+    },
+
+    togglePlaySetup: function () {
+        const controls = document.getElementById('play-controls');
+        controls.classList.toggle('active');
+    },
+
+    startGame: function () {
+        const hiddenCountInput = document.getElementById('hidden-count');
+        let count = parseInt(hiddenCountInput.value) || 0;
+
+        // Cap count to reasonable limits (1-80)
+        count = Math.max(1, Math.min(80, count));
+        hiddenCountInput.value = count;
+
+        this.isPlaying = true;
+        const puzzleMatrix = this.core.generatePuzzle(count);
+
+        this.renderGrid(puzzleMatrix);
+        document.getElementById('play-controls').classList.remove('active');
     },
 
     renderGrid: function (matrix) {
@@ -60,14 +85,83 @@ const app = {
                         const row = boxRow * 3 + i;
                         const col = boxCol * 3 + j;
                         const cell = document.createElement('div');
-                        cell.className = 'cell pop-in'; // Add animation class
-                        cell.textContent = matrix[row][col];
+
+                        const value = matrix[row][col];
+
+                        if (this.isPlaying && value === 0) {
+                            // Editable cell
+                            cell.className = 'cell pop-in editable';
+
+                            // Setup input handling
+                            cell.onclick = () => this.handleCellClick(cell, row, col);
+                        } else {
+                            // Fixed cell
+                            cell.className = 'cell pop-in';
+                            cell.textContent = value !== 0 ? value : '';
+                        }
 
                         box.appendChild(cell);
                     }
                 }
                 board.appendChild(box);
             }
+        }
+    },
+
+    handleCellClick: function (cellElement, row, col) {
+        // Simple prompt for now, can be upgraded to on-screen keypad later
+        // or we can just replace innerHTML with an input
+
+        // If already correct, don't allow changing
+        if (cellElement.classList.contains('correct')) return;
+
+        cellElement.innerHTML = '';
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.className = 'cell-input';
+        input.maxLength = 1;
+
+        input.onblur = () => {
+            const val = parseInt(input.value);
+            if (!isNaN(val) && val >= 1 && val <= 9) {
+                this.validateMove(cellElement, row, col, val);
+            } else {
+                cellElement.innerHTML = ''; // Clear if invalid
+                cellElement.classList.remove('active');
+            }
+        };
+
+        input.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                input.blur();
+            }
+        };
+
+        cellElement.appendChild(input);
+        input.focus();
+        cellElement.classList.add('active');
+    },
+
+    validateMove: function (cellElement, row, col, value) {
+        const isValid = this.core.validateMove(row, col, value);
+
+        cellElement.textContent = value;
+        cellElement.classList.remove('active');
+        cellElement.classList.remove('correct', 'incorrect');
+
+        // Trigger reflow to restart animation if needed
+        void cellElement.offsetWidth;
+
+        if (isValid) {
+            cellElement.classList.add('correct');
+        } else {
+            cellElement.classList.add('incorrect');
+            // Allow retry
+            setTimeout(() => {
+                cellElement.classList.remove('incorrect');
+                cellElement.textContent = '';
+                cellElement.classList.add('editable');
+            }, 1000);
         }
     },
 

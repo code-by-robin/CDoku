@@ -45,6 +45,16 @@
         <div class="controls">
             <button class="btn btn-secondary" onclick="app.showLanding()">Back</button>
             <button class="btn" onclick="app.runSingle()">Regenerate</button>
+            <button class="btn btn-secondary" onclick="app.togglePlaySetup()">Play</button>
+        </div>
+
+        <div id="play-controls" class="play-controls-container">
+            <div class="control-group">
+                <span class="input-label">Hidden Fields:</span>
+                <input type="number" id="hidden-count" class="number-input" value="10" min="1" max="80">
+            </div>
+            <button class="btn" onclick="app.startGame()" style="margin-top: 0; padding: 0.8rem 2rem;">Start
+                Game</button>
         </div>
     </div>
 

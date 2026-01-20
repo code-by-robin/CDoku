@@ -107,5 +107,33 @@ class SudokuCore {
                 }
             }
         }
+
+        // Store the valid solution
+        this.solution = matrix.map(row => [...row]);
+    }
+
+    generatePuzzle(hiddenCount) {
+        // Ensure we have a solution first
+        if (!this.solution) return;
+
+        // Reset matrix to match solution
+        this.matrix = this.solution.map(row => [...row]);
+
+        let attempts = hiddenCount;
+        while (attempts > 0) {
+            let row = Math.floor(Math.random() * 9);
+            let col = Math.floor(Math.random() * 9);
+
+            if (this.matrix[row][col] !== 0) {
+                this.matrix[row][col] = 0;
+                attempts--;
+            }
+        }
+        return this.matrix;
+    }
+
+    validateMove(row, col, value) {
+        if (!this.solution) return false;
+        return this.solution[row][col] === value;
     }
 }
