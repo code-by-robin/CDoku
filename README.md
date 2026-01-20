@@ -16,11 +16,17 @@ gcc src/single_run.c -o single_run
 ```
 
 ### Web Version (`src/web/`)
-A premium web-based interface that runs the generator logic directly in the browser using JavaScript.
+A premium web-based interface that runs the generator logic directly in the browser using JavaScript. The UI features a modern, physics-based "Glassmorphism" design with 3D animations.
 
-*   **Features**:
-    *   **Single Run**: Visualizes the generated Sudoku grid instantly in a modern UI.
-    *   **Benchmark**: Runs the 100,000 iteration loop to measure browser performance.
+*   **Single Run & Play Mode**:
+    *   **Generate**: Visualizes a valid Sudoku grid instantly.
+    *   **Play**: Turn the generated grid into a playable puzzle!
+        *   **Configurable Difficulty**: Choose exactly how many fields to hide (1-80).
+        *   **Interactive**: Click empty cells to enter numbers.
+        *   **Smart Validation**: Immediate feedback—Correct entries glow green, incorrect ones shake red. The system ensures the puzzle remains solvable based on the original generation.
+*   **Benchmark Mode**:
+    *   Runs a high-performance 100,000 iteration loop to measure browser JS speed.
+    *   **Live Progress**: Features a physics-based "rubber band" progress bar and live counter (can be toggled for max speed).
 *   **Usage**: Open `src/web/index.html` in any modern web browser.
 
 ## Note on Creation
